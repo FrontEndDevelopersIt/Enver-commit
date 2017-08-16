@@ -42,6 +42,8 @@
         <button :class="{active: disableBtn}" :disabled="disableBtn" @click.prevent="onReset">
           Reset
         </button>
+      <span class="" v-show="showMsg" >{{ btnMsg }}</span>
+
 
     </div>
   </div>
@@ -69,6 +71,8 @@
                 passwordMsg2: '',
                 emailMsg: '',
                 disableBtn: true,
+                showMsg : true,
+                btnMsg: '',
             }
         },
 
@@ -105,7 +109,7 @@
                         password: this.user.password,
                         password_confirmation: this.user.password2,
                     };
-                if(this.user.password!== '' && this.user.password2 && this.user.email !== ''){
+                if(this.user.password!== '' || this.user.password2 || this.user.email !== ''){
                     request.postData(url, params);
                 }
                 else{

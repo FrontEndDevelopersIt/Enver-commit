@@ -34,6 +34,8 @@
                             <tr class='tr'>
                                 <input class="btn" data-disable-with="Signing in…" name="commit" tabindex="2" type="submit" value="Sign in" @click.prevent="onSingIn"/>
                             </tr>
+                            <span class="" v-show="showMsg" >{{ btnMsg }}</span>
+
                         </table>
                     </div>
                 </form>
@@ -44,8 +46,6 @@
 </template>
 
 <script>
-
-    let token = '';
 
     import Vue from 'vue'
     import Vuex from 'vuex'
@@ -59,9 +59,9 @@
         name: 'singIn',
         data () {
             return {
-                user:{
+                user: {
                     mail: '',
-                    password:'',
+                    password: '',
                     remember: false
                 },
                 showSignOut: false,
@@ -70,6 +70,8 @@
                 isErrorMail: true,
                 emailMsg: '',
                 passwordMsg: '',
+                showMsg : true,
+                btnMsg: '',
 
             }
         },
@@ -83,48 +85,39 @@
                 this.passwordMsg = validationService.CheckPswd(value);
             },
         },
-        methods:{
+        methods: {
             onSingIn(){
+                let msg = '';
                 const url = 'http://178.124.206.45:443/api/login';
                 const options = {
                     email: this.user.mail,
                     password: this.user.password,
-                    remember : this.user.remember
+                    remember: this.user.remember
                 };
-                if(this.user.mail === '' || this.user.password === '')
-                {
+                if (this.user.mail === '' || this.user.password === '') {
                     alert('All fields are required!!!')
                 }
-                else{
-                    axios.post(url, options).then(function (response) {
-                        token = response.data.data.token;
-                        console.log(response.data.data.token);
-                        localStorage.setItem('JWT', token);
-                        console.log(response);
-                        console.log(response.status);
-                    }).catch(function(error){
-                        console.log(error);
-                    })
+                else {
+                    msg = request.postData(url, options, /*'/'*/);
+                    console.log(msg)
                 }
             },
 
             getToken()
             {
-                return token;
+                return localStorage.getItem('JWT');
             },
 
             SingOut(){
-                axios.get('/user', {
+                const url = 'http://178.124.206.45:443/api/logout';
+                let JWT = getToken();
+                options = {
                     params: {
-                        JWT: token
+                        token: JWT
                     }
-                })
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                };
+                request.getData(url, options, '/');
+                // localStorage.clear;
             }
         }
     }

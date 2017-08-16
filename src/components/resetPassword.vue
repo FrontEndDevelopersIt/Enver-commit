@@ -18,7 +18,7 @@
       </tr>
       <tr><input v-model="user.mail" autofocus="autofocus" class="form-control input-block" id="login_field" name="login" tabindex="1" type="email"/></tr>
       <span v-show="isErrorMail" >{{ emailMsg }}</span>
-      <span class="" v-show="showMsg" >{{ btnMsg }}</span>
+
       <br>
           <div class="button_cont">
 
@@ -26,6 +26,7 @@
           <button class='btn' @click.prevent="onReset">
              Reset password
           </button>
+      <span class="" v-show="showMsg" >{{ btnMsg }}</span>
            </router-link>
 
 
@@ -54,9 +55,9 @@
               user:
                   {mail: ''},
               emailMsg: '',
-              btnMsg: '',
               isErrorMail : true,
               showMsg : true,
+              btnMsg: '',
           }
       },
 
@@ -74,12 +75,12 @@
                       email: this.user.mail,
                   }
               };
-
+              let msg = ''
 
               if(this.user.mail !== '')
               {
-                  request.getData(url, options);
-                  this.btnMsg = 'Check your email address';
+                  this.btnMsg = request.getData(url, options);
+                  this.btnMsg = msg;
                }
               else{
                   this.btnMsg = 'Field is required!!!';

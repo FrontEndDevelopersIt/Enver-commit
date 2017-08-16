@@ -95,6 +95,7 @@
                         SING UP
                     </button>
                 </tr>
+                <span class="" v-show="showMsg" >{{ btnMsg }}</span>
 
             </table>
         </div>
@@ -130,6 +131,8 @@
                 passwordMsg: '',
                 passwordMsg2: '',
                 disableBtn: true,
+                showMsg : true,
+                btnMsg: '',
             }
         },
         watch: {
@@ -176,13 +179,14 @@
                 };
                 if(this.newUser.name !== '' && this.newUser.email !== '' && this.newUser.city !== '' && this.newUser.password !== '' && this.newUser.password2 !== '') {
                     console.log('name : ', this.newUser.name,' email : ', this.newUser.email,' city : ', this.newUser.city,' passsword : ', this.newUser.password,' mailing : ',this.newUser.mailing );
-                    axios.post(url, options).then((response)=> {
-                        console.log(response);
-                        console.log(response.status);
-                        console.log(response.header);
-                    }).catch((error)=>{
-                        console.log(error);
-                    })
+                    request.postData(url, options);
+//                    axios.post(url, options).then((response)=> {
+//                        console.log(response);
+//                        console.log(response.status);
+//                        console.log(response.header);
+//                    }).catch((error)=>{
+//                        console.log(error);
+//                    })
                 }
                 else{
                     alert('Не все поля заполнены!!! ');
