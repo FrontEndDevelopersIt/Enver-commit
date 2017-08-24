@@ -38,11 +38,12 @@
           </span>
         </div>
 
-
-        <button :class="{active: disableBtn}" :disabled="disableBtn" @click.prevent="onReset">
+        <router-link to="/singIn">
+        <button :class="{active: disableBtn}" :disabled="disableBtn" @click.prevent="onReset()">
           Reset
         </button>
-      <span class="" v-show="showMsg" >{{ btnMsg }}</span>
+        </router-link>
+        <span id="msg"></span>
 
 
     </div>
@@ -59,6 +60,7 @@
 
     export default {
         name: "change",
+
         data() {
             return {
                 user: {
@@ -102,20 +104,32 @@
 
         methods:{
             onReset(){
-                const url = 'http://178.124.206.45:443/api/password';
+                const url = 'http://api.spidergrodno.tk/api/password';
+                let token = this.getToken().replace(/[#]/g, '');
+                console.log(token, 52163511651);
                 const params =
                     {
+                        token: token,
                         email: this.user.email,
                         password: this.user.password,
                         password_confirmation: this.user.password2,
                     };
+                let defaultUrl = '/singIn';
                 if(this.user.password!== '' || this.user.password2 || this.user.email !== ''){
-                    request.postData(url, params);
+                    request.postData(url, params, defaultUrl, function (msg) {
+                        document.getElementById('msg').innerHTML = msg;
+                        console.log(document.getElementById('msg').innerHTML);
+                    });
                 }
                 else{
                     alert('something wrong!!!');
                 }
                 console.log(document.location.href);
+            },
+
+            getToken()
+            {
+              return this.$route.hash;
             }
         }
     }
@@ -134,7 +148,7 @@
     width: 550px;
     border-radius: 10px;
     box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.15);
-    background-image: url(/src/img/blue.jpg);
+    background-image: url(/img/blue.jpg);
     background-position: center;
     background-attachment: fixed;
   }

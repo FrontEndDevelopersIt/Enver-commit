@@ -1,12 +1,18 @@
 <template>
-    <span>
-        <a href="#" v-if="isFavorited" @click.prevent="unFavorite(favPost)">
-            <i class="material-icons">star</i>
-        </a>
-        <a href="#" v-else @click.prevent="favorite(favPost)">
-            <i class="material-icons">star_border</i>
-        </a>
-    </span>
+      <div class="icon_star">
+            <a href="#"  v-if="vacancy.ip===true"  @click.prevent="unFavorite(vacancy.id)">
+                <i   v-bind:style="{ color: activeColor}"  class="material-icons">star</i>
+            </a>
+            <a href="#"  v-else-if="col"  @click.prevent="unFavorite(vacancy.id)">
+                <i   v-bind:style="{ color: activeColor}"  class="material-icons">star</i>
+            </a>
+            <a href="#" v-else-if="!vacancy.ip" @click.prevent="favorite(vacancy.id)">
+                <i  v-bind:style="{ color: passiveColor}" class="material-icons">star_border</i>
+            </a>
+            <a href="#" v-else-if="!col" @click.prevent="favorite(vacancy.id)">
+                <i  v-bind:style="{ color: passiveColor}" class="material-icons">star_border</i>
+            </a>
+      </div>
 </template>
 
 
@@ -22,46 +28,93 @@ Vue.use(Vuex)
 Vue.use(VueAxios, axios)
 export default {
     name: 'favorite',
-    props: {
-        favPost: {
-            type: Number,
-            default: 1
-        },
-        favorited: {
-        }
+    props: ['vacancy'],
+    data(){
+      return {
+        isFavorited: false,
+        activeColor: null,
+        passiveColor: null,
+        col: null
+      }
     },
-    data: function() {
-            return {
-                isFavorited: '',
-            }
-        },
-    mounted() {
-            this.isFavorited = this.isFavorite ? true : false;
-        },
-    computed: {
-            isFavorite() {
-                return this.favorited;
-            },
+    computed:{
+      tokenPresence(){
+        return this.$store.state.tokenPresence
+      },
+    },
 
-        },
     methods: {
-            favorite(post) {
-                axios.post('http://localhost/api/vacancy', [this.favPost])
-                    .then(response => this.isFavorited = true
+        favorite(favPost) {
+            if(this.$store.state.tokenPresence===false){
+                this.$store.commit("showModal", true)
 
-                    )
-                    .catch(response => console.log(response.data));
-            },
+            } else {
+                this.passiveColor = "#f79859"
+                this.activeColor = "#f79859"
+                this.vacancy.ip = true
+                this.$store.dispatch('favorite', favPost)
+          }
+        },
+          unFavorite(favPost) {
+            this.passiveColor = "#f79859"
+            this.activeColor = "gray"
+            this.vacancy.ip = false
+             this.$store.dispatch('unFavorite', favPost)
+           },
+           getFavoriteVacancies(){
+             if (this.tokenPresence === true) {
+             this.$store.dispatch('getFavoriteVacancies')
+           }
+           else {
 
-            unFavorite(post) {
-                axios.delete('http://localhost/api/vacancy/', [this.favPost])
-                    .then(response => this.isFavorited = false)
-                    .catch(response => console.log(response.data));
-            }
+           }
         }
+      },
+        created(){
+            this.getFavoriteVacancies()
+        },
+}
+
+
+</script>
+
+<style scoped>
+
+.icon_star i{
+  color: #f79859
+}
+.icon_star {
+  position: relative;
+      display: inline-block;
+
+}
+.tooltiptext {
+display: none;
+width: 120px;
+color: black;
+text-align: center;
+border-radius: 6px;
+padding: 5px 0;
+position: absolute;
+bottom:  -3px;
+z-index: 0;
+margin-left: -250px;
+font-weight: 300px;
+font-size: 15px;
+
+
+}
+.tooltiptext span{
+  text-transform: none;
+}
+.tooltiptext b {
+ border-bottom: 1px dashed black;
+}
+
+  .icon_star:hover .tooltiptext{
+    display: block;
 
 }
 
 
-
-</script>
+</style>

@@ -95,8 +95,7 @@
                         SING UP
                     </button>
                 </tr>
-                <span class="" v-show="showMsg" >{{ btnMsg }}</span>
-
+                <span id="msg"></span>
             </table>
         </div>
     </div>
@@ -168,7 +167,7 @@
 
         methods: {
             onSignUp(){
-                const url = 'http://178.124.206.45:443/api/user/';
+                const url = 'http://api.spidergrodno.tk/api/user/';
                 const options = {
                     name: this.newUser.name,
                     email: this.newUser.email,
@@ -177,20 +176,19 @@
                     city: this.newUser.city,
                     newsletter : this.newUser.mailing
                 };
+                let defaultUrl = '/check';
                 if(this.newUser.name !== '' && this.newUser.email !== '' && this.newUser.city !== '' && this.newUser.password !== '' && this.newUser.password2 !== '') {
                     console.log('name : ', this.newUser.name,' email : ', this.newUser.email,' city : ', this.newUser.city,' passsword : ', this.newUser.password,' mailing : ',this.newUser.mailing );
-                    request.postData(url, options);
-//                    axios.post(url, options).then((response)=> {
-//                        console.log(response);
-//                        console.log(response.status);
-//                        console.log(response.header);
-//                    }).catch((error)=>{
-//                        console.log(error);
-//                    })
+                    request.postData(url, options, defaultUrl, function (msg) {
+                        document.getElementById('msg').innerHTML = msg;
+                        console.log(document.getElementById('msg').innerHTML);
+                    });
+                    localStorage.setItem('options', options);
                 }
                 else{
                     alert('Не все поля заполнены!!! ');
                 }
+                this.$route.params
             }
         }
     }
@@ -216,7 +214,7 @@
     .registration_cont {
         padding-top: 1px;
         background-color: #088ecc;
-        background-image: url(/src/img/blue.jpg);
+        background-image: url(/img/blue.jpg);
         background-position: center;
         background-attachment: fixed;
         padding-bottom: 40px;

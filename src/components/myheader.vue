@@ -1,50 +1,54 @@
 <template>
-<header>
-  <div class="header">
-    <div class="left_container ">
-      <span>
-            <router-link to="/">
-                <img src="/src/img/exposit3.png" alt="">
-            </router-link>
-      </span>
-      <span>
-            <router-link to="/">
-                <p>Главная</p>
-             </router-link>
-    </span>
+    <div>
+
+
+          <div class="img">
+            <div class="imageExposit">
+                    <img src="/img/exposit3.png" @click="mainPage()">
+            </div>
+            <div class="routerLink">
+                    <p @click="mainPage()">Главная</p>
+            </div>
+
+            <div class="greetings" >
+              <p class="text" v-show="!this.$store.state.tokenPresence">&#8222;Найти работу - легко!&#8221; </p>
+              <p v-show="this.$store.state.tokenPresence">{{this.helloAutorization}}</p><p><router-link to="/settings">  {{ this.$store.state.userInfo.name}}</router-link></p>
+            </div>
+
+            <div class="someBlock">
+                <dropDown v-if="this.$store.state.tokenPresence"></dropDown>
+                <div class="" v-if="this.$store.state.tokenPresence==false">
+                <router-link to="/singIn">
+                    <button class="button">Войти</button>
+                </router-link>
+                  </div>
+                <div class="" v-if="this.$store.state.tokenPresence==false">
+                <router-link to="/registration">
+                    <button class="button">Регистрация</button>
+                </router-link>
+              </div>
+            </div>
+
+
+          </div>
+
+        <div class="line bottom">
+            <div class="line_bottom_container">
+              <input type="search" name="" v-model="searchQuery" placeholder="Введите текст" @keyup.enter="searchActivator()">
+              <button type="button" name="button" @click="searchActivator()"><p>Найти</p></button>
+            </div>
+            <div class="icon_bar">
+                <a href="http://www.exposit.com/"><img class="img1" src="img/logotype.png" alt=""></a>
+                <a href="https://ru-ru.facebook.com/expositds/"><img class="img2" src="img/fb-art.png" alt=""></a>
+                <a href="https://vk.com/expositds"><img class="img3" src="img/ic_vk.png" alt=""></a>
+                <a href="https://jobs.tut.by/employer/1681914"><img  class="img4" src="img/vectorpaint6.svg" alt=""></a>
+            </div>
     </div>
-    <div class="search_cont">
-      <div class="search">
-        <input type="search" name="" v-model="searchQuery" placeholder="Введите текст">
-      </div>
-        <button v-if='show' type="button" name="button" @click="searchButton"><i class="material-icons">search</i></button>
+
     </div>
-    <div class="right_container">
-      <span>
-      <div class="dropdown">
-        <p>
-          <dropDown></dropDown>
-        </p>
-      </div>
-</span>
-      <span>
-      <router-link to="/singIn">
-        <div class="reg">
-          <p>Войти</p>
-        </div>
-      </router-link>
-</span>
-      <span>
-      <router-link to="/registration">
-        <div class="reg">
-          <p>Регистрация</p>
-        </div>
-      </router-link>
-</span>
-    </div>
-  </div>
-</header>
 </template>
+
+
 
 
 <script>
@@ -54,6 +58,8 @@ export default {
   data() {
     return {
       show: false,
+      hello: "Найди работу мечты",
+      helloAutorization: "Привет, ",
     };
   },
   components: {
@@ -66,14 +72,29 @@ export default {
       },
       get() {
         return this.$store.getters.searchQuery
-      }
+      },
+
     }
   },
   methods: {
+    searchActivator(){
+      var x = this
+      this.$router.push({name: 'page', params: {page: 1}});
+      this.$store.dispatch('getVacancies')
+    },
     hideProfile() {
       this.$store.dispatch('hideProfile')
-    }
+    },
+    mainPage(){
+      this.$store.commit("searchQuery", null)
+      this.$store.commit("employmentCommit", null)
+      this.$store.commit("cityCommit", null)
+      this.$router.push({path: '/'});
+      this.$store.dispatch('getVacancies', 1)
+    },
+
   },
+
   watch: {
     'searchQuery'(value){
       if (value.length > 3){
@@ -83,6 +104,11 @@ export default {
         this.show = false
       }
     }
+  },
+  created(){
+      this.$store.dispatch('tokenChecker')
+  if(this.$store.state.tokenPresence===true) {this.$store.dispatch('getUserInfo')}
+
   }
 
 }
@@ -90,127 +116,305 @@ export default {
 
 <style scoped>
 
-header {
-  background-color: #039BE5 !important;
+    .header {
+        display: flex;
+        flex-direction: row;
+        height: 80px;
+        align-items: center;
+        justify-content: space-around;
+    }
+
+    header p {
+        color: white;
+        cursor: pointer;
+    }
+
+
+    .reg>p {
+        font-size: 20px;
+        background-color: #ef7f35;
+        padding: .5em 1.3em;
+        border-radius: 5px;
+
+    }
+
+
+    .right_container {
+        display: inline-block;
+        float: right;
+        margin-right: 20px;
+        padding: 0px;
+        width: 25%;
+    }
+
+
+    img {
+        height: 50px;
+        margin-right: 30px;
+        cursor: pointer;
+    }
+
+    a:hover {
+        text-decoration: none !important;
+    }
+
+
+
+    input[type=search] {
+        box-shadow: none;
+        border-bottom: none!important;
+        height: 2em;
+    }
+      .search:active{
+        background-color: rgb(237, 241, 237);
+      }
+
+
+    input[type=search]:active {
+        border-bottom: none!important;
+        box-shadow: none;
+
+    }
+
+    input[type=search]:focus {
+        border-bottom: none;
+        box-shadow: none;
+    }
+
+
+    .routersLinks {
+        display: flex;
+    }
+    .routerLink {
+        margin-left: 10px;
+        padding-top: 14px;
+    }
+    .routerLink p{
+      display: inline;
+      color: white;
+      cursor: pointer;
+      font-size: 23px;
+        font-weight: 300;
+
+
+    }
+
+    .routerLink p:hover {
+
+      border-bottom: 2px dashed white;
+
+    }
+    .someBlock {
+      display: flex;
+        justify-content: flex-end;
+        width: 40%;
+
+    }
+    .button {
+        margin-left: 10px;
+        line-height: 20px;
+        background-color: #ef7f35;
+        padding: .5em 1.3em;
+        border: none!important;
+        border-style: none;
+        border-radius: 5px;
+        color: snow;
+        position: relative;
+
+        height: 100%;
+        font-size: 23px;
+          font-weight: 300;
+
+    }
+    button{
+      margin-right: 8px;
+    }
+    button:hover{
+      transition: 0.2s;
+      background-color: #fa995a;
+    }
+    button:active{
+      background-color: #cb5b12;
+      transform: translateY(-5px);
+    }
+    .imageExposit {
+        height: 0;
+    }
+
+
+    .greetings{
+      display: flex;
+      flex-flow: row;
+      justify-content: center;
+      width: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 23px;
+        font-weight: 300;
+    }
+
+    .greetings p:first-child{
+      margin-right: 10px;
+      cursor: default;
+      margin-left: 8px;
+      color: black;
+
+    }
+
+    .greetings p:nth-child(2){
+      font-weight: 400;
+
+
+
+    }
+    .greetings p:nth-child(2):hover{
+      transition: 0.2s;
+      font-weight: 400;
+
+
+    }
+
+    .greetings a{
+      color: white;
+    }
+
+
+
+
+
+
+
+  .line{
+    background: linear-gradient(0deg, rgba(98, 209, 245, 0.84), rgba(98, 209, 245, 0.84)), url("/img/header.jpeg");
+    background-repeat: no-repeat;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-position: 0% 35%;
+    border-top: 1px solid  #046595;
+    border-bottom: 1px solid  #046595;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    padding-left: 20%;
+
+  }
+  input[type=search] {
+        background-color: #ffffff;
+        cursor: pointer;
+        width: 100%;
+        border: none;
+        border-radius: 0px;
+        font-weight: 300;
+        margin: auto;
+        padding-top: 5px;
+      background-image:url(/img/search.svg);
+      background-size: 28px 80%;
+      background-repeat:no-repeat;
+      background-position: 5px 5px;
+      padding-left:35px;
+      font-size:15px;
+
+
+    }
+
+  input[type=search]:focus {
+      outline: none!important;
+  }
+
+  .line button {
+    background-color: #046595;
+    color:  inherit;
+    border: none;
+    font-size: 1.4em;
+    display: inline-block;
+    color: white;
+
+}
+.line p {
+  display: inline;
+}
+button{
+  white-space: nowrap;
+}
+
+button:hover{
+  transition: 0.25s;
+  filter: brightness(115%);
+}
+button:active{
+  filter: brightness(85%);
+  transform: translateY(-5px);
+}
+
+.line i {
+  vertical-align: bottom;
+}
+
+
+.img {
+  display: flex;
+  background-color: #c1eaff;
+background: linear-gradient(0deg, rgba(98, 209, 245, 0.84), rgba(98, 209, 245, 0.84)), url("/img/header.jpeg");
+background-repeat: no-repeat;
+background-size: cover;
+background-attachment: scroll;
+background-position: 0% 25%;
+  flex-flow: row nowrap;
+  width: 100%;
+  min-height: 100px;
+  max-height: 100px;
+  display: flex;
+  padding: 27px 27px;
+
+
+}
+img{
+  display: inline-block;
+}
+
+
+button p{
+  padding: 10px 17px;
   font-size: 20px;
   font-weight: 300;
-  padding-left: 15px;
-  max-height: 80px;
 }
-
-
-.header {
+.line_bottom_container{
   display: flex;
-  flex-direction: row;
-  height: 80px;
+  width: 80%;
 }
-
-header p {
-  color: white;
-}
-
-.left_container {
-  width: 20%;
-  margin-bottom: 20px;
-}
-
-.left_container span {
-  display: inline-block;
-  margin-left: 10px;
-  padding-top: 10px;
-}
-
-.right_container span {
-  display: inline-block;
-  margin-left: 10px;
+.icon_bar{
+  width: 18%;
+  vertical-align: middle;
   padding-top: 5px;
+  justify-content: flex-end;
+  display: flex;
+}
+.line a {
+
+}
+.line .img1{
+  width: 32px;
+  margin-right: -4px;
 }
 
-.reg>p {
-  font-size: 20px;
-  background-color: #ef7f35;
-  padding: .5em 1.3em;
-  border-radius: 5px;
-}
-
-
-.right_container {
-  display: inline-block;
-  float: right;
-  margin-right: 20px;
-  padding: 0px;
-  width: 25%;
-}
-
-
-img {
-  height: 50px;
-  margin-right: 30px;
-}
-
-a:hover {
-  text-decoration: none !important;
+.line  .img4 {
+  width: 40px;
+  height: 20px;
+  margin-left: -3px;
 }
 
 
-.search {
-  display: inline-block;
-  box-shadow: inset rgba(166, 190, 205, .3) 2px 3px 2px;
-  border-radius: 10PX;
-  background-color: white;
-  padding-left: 7px;
-  border-bottom: none!important;
-  width: 85%;
-  height: 38px;
-  margin-left: 20px;
+.line img {
+  margin: 0px;
+  margin-left: 12px;
+  width: 21px;
+  height: 20px;
 }
 
 
-input {
-  line-height: 3;
-  font-size: 20px;
-  cursor: pointer;
-  float: left;
-  display: inline-block;
+
+.text{
+  padding-left: 35%;
 }
-
-::-webkit-input-placeholder {
-  color: gray;
-}
-
-
-input[type=search] {
-  box-shadow: none;
-  border-bottom: none!important;
-}
-
-
-input[type=search]:active {
-  border-bottom: none!important;
-  box-shadow: none;
-}
-
-input[type=search]:focus {
-  border-bottom: none;
-  box-shadow: none;
-}
-
-.search_cont {
-  width: 60%;
-  align-self: center;
-}
-
-.search_cont > button {
-  width: 5%;
-  font-size: 20px;
-  background-color: #ef7f35;
-  padding: 4px 5px;
-  border-radius: 5px;
-  margin-left: 10px;
-}
-.search_cont button i {
-  padding: 0px 0px;
-}
-
-
 </style>

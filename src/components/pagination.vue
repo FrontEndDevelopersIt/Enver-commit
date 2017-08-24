@@ -5,7 +5,7 @@
                   <div class="left">
                       <div class="pagination_left pag" v-show="this.$route.params.page > 1">
                       <router-link :to= "{name: 'page', params: {page: this.$route.params.page-1}}">
-                              <i class="material-icons">navigate_before</i>
+                              <i><img src="img/left.png" alt=""></i>
                       </router-link>
                        <div class="buffer" v-if="this.$route.params.page <= 3"></div>
                        </div>
@@ -64,7 +64,8 @@
                   <div class="pagination_right pag" v-if="this.$route.params.page < this.totalPages">
                      <router-link :to= "{name: 'page', params: {page: parseInt(this.$route.params.page) + parseInt(1)}}">
 
-                          <i class="material-icons">navigate_next</i>
+
+                          <i><img src="img/right.png" alt="" style= 'color: white'></i>
 
                           </router-link>
                   </div>
@@ -133,34 +134,18 @@ export default {
 <style scoped>
 
     .pagination {
-        width: 50%;
+        width: 70%;
         margin: auto;
         display: flex;
         flex-flow: nowrap;
-
-
-
-
     }
-
     .pagination_mid {
         flex-flow: nowrap;
         justify-content: center;
         display: flex;
 
 
-
-
     }
-
-    .pagination_midl {
-        min-width: 700px;
-
-
-    }
-
-
-
 
     .pagination_left {
         float: left;
@@ -188,7 +173,6 @@ export default {
     }
 
 
-
     .transition_nav {
         margin-left: 200px;
     }
@@ -202,17 +186,13 @@ export default {
         opacity: 1;
     }
 
-
     .wrap_a>a:hover {
         text-decoration: none;
     }
     .wrap_a:hover {
         box-shadow: inset rgba(0,0,0,.2) 0 0px 2px 0.5px;
         transition: 0.3s;
-
-
     }
-
 
     .wrap_a:active {
         box-shadow: inset rgba(0,0,0,.6) 0 0 2px;
@@ -220,7 +200,6 @@ export default {
     }
 
     .wrap_a {
-
         border: 1px solid #D3D1D8;
         opacity: 1;
         border-radius: 7px;
@@ -265,25 +244,48 @@ export default {
     .transition:hover{
         border: none;
         box-shadow: none;
-        background-color: #fff;
+
         color: none;
         opacity: 1;
 
     }
-    .buffer {
-        padding-right: 155px;
+
+
+
+
+    img{
+      color: white;
     }
 
-    .buffer_left{
-        padding-left: 200px;
+
+    @media screen and (min-width: 1400px){
+    .pagination_mid {
+      max-width: 800px;
+      min-width: 800px;
     }
 
-    .left, .right {
-        width: 50px;
+    }
+    @media (max-width: 1400px){
+      .pagination_mid {
+        min-width: 650px;
+        max-width: 650px;
+      }
     }
 
-    .dots:hover  a{
-        background-color: #F7FCFF;
+    @media (max-width: 1200px){
+      .pagination_mid {
+        min-width: 400px;
+        max-width: 400px;
+        margin-left: 50px;
+      }
     }
+    @media only screen and (max-width: 800px) {
+      .pagination_mid{
+        color: red;
+        background-color: red;
+      }
+    }
+
+
 
 </style>

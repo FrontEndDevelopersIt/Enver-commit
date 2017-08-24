@@ -1,19 +1,20 @@
+
 <template>
+  <div class="">
+  <div class="line">
+      <filtrationMini></filtrationMini>
+  </div>
 <div class="mainPage" v-on:mouseover="hideProfile()">
-  
   <div class="section_1">
     <filtration></filtration>
   </div>
-
-  <div class="section_2">
-
+  <div class="section_2" >
     <pagination v-bind:col='parseInt(this.$route.params.page)' v-bind:dot="parseInt(this.totalPages)"></pagination>
-
     <br>
-    <div class="container" >
-      <div class="oops" v-if='vacanciesPerPage.length == 0'><p>Ooops, вакансии по данным критериям отсуствуют</p> </div>
-      <div class="vacancy" v-for="(vacancy, index) in vacanciesPerPage">
-        <router-link :to="{name: 'vacancy', params: {id: vacancy.id , index: index-1}}">
+    <modal v-if="showModal" @close="showModal = false"></modal>
+      <div class="oops"><p  :style="notification" v-if="vacanciesPerPage.length===0">{{myResolvedValue}}</p> </div>
+      <div class="vacancy" v-for="(vacancy, index) in vacanciesPerPage" >
+        <router-link :to="{name: 'vacancy', params: {id: vacancy.id , index: index-1}}" >
           <div class="top_cont">
             <div class="square">
               <p>{{date(vacancy.date)}}</p>
@@ -22,7 +23,8 @@
           </div>
           <div class="main_cont">
             <div class="vacancy_img_wrap">
-              <img src="http://bellagambaam.weebly.com/uploads/7/2/5/0/72504765/1424977_orig.jpg">
+              <img v-if='vacancy.logo' v-bind:src=vacancy.logo  /></img>
+              <img v-else src="/img/worklogo.png" ></img>
             </div>
             <div class="vacancy_cont">
               <div class="vacancy_header">
@@ -30,26 +32,20 @@
                   <router-link :to="{name: 'vacancy', params: {id: vacancy.id}}">{{vacancy.title }}
                   </router-link>
                 </div>
-                <div class="icon_star">
-                  <favorite v-bind:favvacancy='parseInt(vacancy.id)'></favorite>
-                </div>
+                  <favorite :vacancy=vacancy></favorite>
               </div>
-
               <div class="discription">
                 <p class="description_body" v-html=vacancy.description></p>
               </div>
-
               <div class="vacancy_bottom">
-                <span class="ex first_ex">
-                        <i class="material-icons">work</i> {{vacancy.company}}
+                <span class="ex first_ex" @click.prevent="getCompany(vacancy.company)">
+                          <i class="material-icons">work</i> {{vacancy.company}}
                     </span>
-                <span class="ex first_ex">
+                <span class="ex first_ex" @click.prevent="getLocation(vacancy.location)">
                         <i class="material-icons">room</i>{{vacancy.location}}
                     </span>
-
                 <div class="ex pro">
-
-                  <span class="link">
+                  <span class="link" >
                             <i class="material-icons">view_headline</i>Подробнее
                         </span >
                     <div class="square_button"></div>
@@ -59,45 +55,97 @@
         </div>
           </router-link>
           </div>
-    </div>
-    <br>
-  <pagination v-bind:col='parseInt(this.$route.params.page)' v-bind:dot="parseInt(this.totalPages)"></pagination>
-     </div>
 
+    <br>
+    <pagination v-bind:col='parseInt(this.$route.params.page)' v-bind:dot="parseInt(this.totalPages)"></pagination>
+     </div>
+  </div>
     </div>
+
 </template>
 
 <script>
 import pagination from './pagination.vue'
+import filtrationMini from './filtrationMini.vue'
 import favorite from './favorite.vue'
 import filtration from './filtration.vue'
-
+import modal from './modal.vue'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 export default {
   name: "mainPage",
+  asyncComputed: {
+  myResolvedValue() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => resolve('Ooops, вакансии по данным критериям отсуствуют...'), 2000)
+    })
+  }
+},
+  data(){
+    return {
+      notification:{
+        fontSize: "17px",
+        height: "40px",
+        padding: "10px",
+        color: "black",
+      },
+    }
+  },
   components: {
     pagination,
     favorite,
-    filtration
+    filtration,
+    filtrationMini,
+    modal
   },
 
   beforeRouteUpdate(to, from, next) {
     next(), next(false),
-      this.getVacancies(this.$route.params.page)
-
+    this.getVacancies(this.$route.params.page)
   },
   computed: {
     totalPages() {
       return this.$store.state.totalPages
     },
+    tokenPresence(){
+      return this.$store.state.tokenPresence
+    },
     vacanciesPerPage() {
       return this.$store.state.vacanciesPerPage
     },
-  },
+    showModal: {
+      set() {
+              this.$store.commit('showModal', false)
+          },
+          get() {
+              return this.$store.state.showModal
+          }
+    }
+    },
   methods: {
     getVacancies(page, limit) {
+      if(parseInt(page) > 12 || page.length >= 3){
+        var x = this
+          x.$router.push({path: '/error'})
+      }
+      else {
       this.$store.dispatch('getVacancies', page, limit)
+}
+    },
+    getLocation(city){
+      this.$store.commit("filterIndicator", true)
+      this.$store.commit("searchQuery", null)
+      this.$store.commit("cityCommit", city)
+      this.$store.dispatch('getVacancies')
+
 
     },
+    getCompany(company){
+      this.$store.commit("searchQuery", company)
+      this.$router.push({name: 'page', params: {page: 1}});
+      this.$store.dispatch('getVacancies')
+    },
+
     hideProfile() {
       this.$store.dispatch('hideProfile')
     },
@@ -110,12 +158,10 @@ export default {
       var newdate = day + "/" + month + "/" + year;
       return newdate
     },
-
   },
   created() {
-    this.$store.commit("filterIndicator", false)
     this.getVacancies(this.$route.params.page, 1)
-
+    this.$store.dispatch('tokenChecker')
   }
 }
 </script>
@@ -128,19 +174,15 @@ export default {
   display: flex;
   flex-direction: row;
   height: 100%;
+
+  background-color: #f5f0f0;
+
 }
 
-.container {
-  display: block;
-  box-sizing: border-box;
-  margin-top: 20px;
-}
 
 .vacancy {
-  background-color: #FAF8FF;
-  min-width: 1000px;
+  background-color: rgba(252, 252, 252, 0.9);
   margin-bottom: 20px;
-  max-width: 1000px;
   position: relative;
   padding-left: 0px;
   overflow: hidden;
@@ -148,22 +190,23 @@ export default {
   box-shadow: rgba(166, 190, 205, .2) 0px 3px 0px;
   display: flex;
   flex-flow: row nowrap;
-  height: 100%;
   position: relative;
-  float: left;
+  margin-left: 70px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  width: 90%;
+  height: 237px;
+
 }
 
-.vacancy_cont {
-  min-width: 800px;
-}
+
 
 .main_cont {
+  width: 100%;
   box-shadow: rgba(166, 190, 205, .5) 2px 3px 2px;
   display: flex;
   flex-flow: row nowrap;
   height: 100%;
-  min-width: 1000px;
-  max-width: 1000px;
 }
 
 
@@ -194,31 +237,30 @@ export default {
 
 .vacancy_img_wrap {
   display: flex;
-
   position: relative;
   margin-right: 20px;
   margin-bottom: 40px;
-  min-width: 18%;
-  padding-left: 5px;
-  padding-top: 10px;
   background-color: #ffffff;
-  height: 100%
+  height: 100%;
+  max-width: 18%;
+    min-width: 18%;
+    padding: 0px 15px;
 }
 
 img {
-  box-shadow: rgba(0, 0, 0, 0.4) 5px 5px 4px;
-  position: absolute;
-  top: -16px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  min-width: 115px;
-  max-width: 115px;
+
+ max-width: 70%;
+ margin: auto;
+ margin-bottom: 100px;
+ padding-top: 10px;
+ box-shadow: rgba(0, 0, 0, 0.2) 5px 5px 4px;
+
+
+
+
 }
 
 .vacancy:hover img {
-  min-width: 123px;
   transition: 0.2s;
 }
 
@@ -232,21 +274,17 @@ img {
   border-bottom: 3px solid #028cd1;
   width: 100%;
   height: 20px;
-  background: #F7FCFF;
+  background: #F5F0F0;
   display: flex;
 }
 
 
-.vacancy-cont {
-  background-color: #A6BECD;
+.vacancy_cont {
   margin: 5px;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   padding: 5px;
   padding-left: 0px;
   position: relative;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
@@ -255,6 +293,7 @@ img {
 
 
 .vacancy_header {
+  width: 100%;
   margin-top: 15px;
   height: 22px;
   font-weight: bold;
@@ -307,21 +346,13 @@ img {
   -ms-text-overflow: ellipsis;
 }
 
-.vacancy:hover p {
-  padding-left: 10px;
-  transition: 0.4s;
-}
-
-
-
-
-
 .vacancy_name:hover {
   transition: all .2s ease;
   cursor: pointer;
 }
 
 .discription {
+    width: 100%;
   margin-right: 60px;
   overflow: hidden;
   padding-right: 40px;
@@ -333,23 +364,33 @@ img {
 
 
 .ex {
+  font-size: 1.1em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: #a4a7a8;
-  height: 35px;
-  padding-top: 5px;
-  width: 35%;
+  height: 100%;
+
+  width: 40%;
 }
 
 
 
-.ex:hover {
+.ex:hover i{
   color: #F57921;
-  transform: scale(1.02);
+  transition: 0.3s;
+
+}
+.ex:active i{
+  transition: none;
+  color: #F57921;
+  line-height: 15px;
 }
 
-.first_ex:hover i {
+.first_ex{
+  font-size: 1.1em;
+}
+.first_ex:hover  {
   color: #F57921;
   transition: 0.2;
 }
@@ -359,21 +400,14 @@ i {
 }
 
 .vacancy_bottom {
+    width: 100%;
   margin-bottom: 10px;
   display: flex;
   flex-flow: row nowrap;
-  height: 100%;
-  padding-top: 15px;
+  padding-top: 12px;
+
 }
 
-
-
-
-
-.md-layout {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 
 
 .a {
@@ -403,19 +437,22 @@ i {
   vertical-align: middle;
   font-weight: 300;
   margin-bottom: 5px;
-  background-color: #039BE5;
+  background-color: #058fd2;
   border-radius: 20px;
-  padding: 4px 9px;
+  font-size: 1.3em;
+  padding: 6px 9px 6px 9px;
+  letter-spacing: -0.7px;
 }
 
-.link:hover i {
-  color: white;
-}
+
 
 .link>i {
-  margin-bottom: -0.5px;
   color: white;
-  font-size: 22px;
+  font-size: 1.3em;
+  margin-top: 0px;
+  vertical-align: bottom;
+  line-height: 20px;
+
 }
 
 .pagination {
@@ -423,8 +460,6 @@ i {
   white-space: nowrap;
   display: flex;
 }
-
-
 
 
 .pag_button {
@@ -486,9 +521,7 @@ a:-webkit-any-link {
 }
 
 .vacancy_cont:active {
-  padding: 1.5px;
   <pagination v-bind: col='parseInt(this.$route.params.page)';
-  v-bind: dot="parseInt(this.totalPages)";
   transition: 0.05;
 }
 
@@ -498,13 +531,15 @@ a:-webkit-any-link {
   color: white;
 }
 
+
 .section_1 {
   width: 20%;
 }
 
 .section_2 {
   float: left;
-  width: 100%;
+  width: 80%;
+
 }
 .description_body>>>i{
   font-weight: 300!important;
@@ -542,11 +577,80 @@ a:-webkit-any-link {
 .description_body>>>strong {
   font-weight: 300!important;
 }
-
-.oops>p {
-  font-size: 14px;
+.oops {
+  margin: auto;
+  display: block;
   text-align: center;
+}
+.oops>p {
+  height: 61vh;
+  font-size: 14px;
   margin-top: 70px;
 
 }
+
+.icon_star i{
+  color: black
+}
+.icon_star {
+  position: relative;
+      display: inline-block;
+
+}
+
+
+  .icon_star:hover .tooltiptext{
+    display: block;
+    transition: 3s;
+}
+
+
+.link:hover i {
+  color: white;
+}
+
+
+
+@media screen and (max-width: 1200px){
+.vacancy {
+  max-width: 800px;
+  mix-width: 800px;
+}
+
+}
+.line{
+  min-width: 100%;
+  display: none;
+}
+
+
+@media screen and (max-width: 1000px){
+.section_1{
+display: none;
+}
+
+.section_1{
+  min-width: 100%;
+}
+.vacancy{
+  min-width: 100%;
+}
+
+.line{
+  display: block;
+}
+
+
+}
+
+@media screen and (max-width: 1300px){
+  .description_body {
+    height: 45px;
+  }
+  .vacancy {
+    height: 190px;
+  }
+}
+
+
 </style>

@@ -3,12 +3,18 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import VueRouter from 'vue-router'
 //Libraries activation
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
+Vue.use(VueRouter)
+var token = localStorage.getItem('JWT')
+axios.defaults.headers.common['Authorization'] = "Bearer " + token
+axios.defaults.headers.common['X-CSRF-Token'] = token
+
 //Import modules
-import {apiDomain, filtration, allVacancy} from './config.js'
-const store = new Vuex.Store({
+import {apiDomain, filtration, allVacancy, search, favorite, logout, user, login} from './config.js'
+export const store = new Vuex.Store({
 //Data container
 state: {
       //vacancyDetails component start
@@ -16,8 +22,11 @@ state: {
         vacanciesPerPage: [],
         pageRange: 2,
         totalPages: null,
-        perPage: null,
-        totalVacancies: null,
+        perPage: 10,
+        totalVacancies: 10,
+        //for map in vacancyDetails start
+        vacancyCoordinates: null,
+        //for map in vacancyDetails end
         //filtration component start
         city: null,
         employment: null,
@@ -27,7 +36,13 @@ state: {
         //myheader component start
         searchQuery: null,
         show: false,
+        tokenPresence: false,
         //myheader component end
+        //favorite start
+        favoriteVacanciesPerPage: [],
+        userInfo: [],
+        isFavorited: false,
+        showModal: false
   },
      mutations: {
          vacanciesPerPage(state, {item}) {
@@ -38,6 +53,9 @@ state: {
          },
          vacancyDetails(state, {item}){
            state.vacancyDetails = item
+         },
+         showModal(state, item){
+           state.showModal = item
          },
       //filtration component start
          cityCommit( state, item ){   //Value of city select
@@ -66,7 +84,31 @@ state: {
         },
         perPageFunction(state, {item}){
           state.perPage = item
-        }
+        },
+        vacancyCoordinates(state, {item}){
+          state.vacancyCoordinates = item
+        },
+        //token
+        tokenPresence(state, {item}){
+          state.tokenPresence = item
+        },
+        //favotite
+        favoriteVacanciesPerPage(state, {item}){
+          state.favoriteVacanciesPerPage = item
+        },
+        isFavorited(state, item){
+          state.isFavorited = item
+        },
+        favoriteVacanciesAdd(state, item){
+          state.favoriteVacanciesPerPage.push(item)
+        },
+        favoriteVacanciesDelete(state, item){
+          state.favoriteVacanciesPerPage.push(item)
+        },
+        //user Info
+        userInfo(state, {item}){
+          state.userInfo = item
+        },
      },
      getters: {
          city (state) {
@@ -80,47 +122,67 @@ state: {
         }
        },
     actions: {
-        getVacancies: function ({ commit }, page, val) {
-          if(store.state.filterIndicator === false) {
+        getVacancies: function ({ commit }, page) {
               var options = {
                   params: {
+                      city: store.state.city,
+                      employment: store.state.employment,
                       page: page,
-                      limit: store.state.perPage
+                      limit: store.state.perPage,
+                      search: store.state.searchQuery,
                     }
                   }
+              if(store.state.searchQuery === null) {
+                if(store.state.tokenPresence){
+                axios.get(favorite).then((response) => {
+                  commit('favoriteVacanciesPerPage', { item: response.data})
+                            }, (err) => {
+  console.log(err)
+
+                        })
+                }
                 axios.get(allVacancy, options).then((response) => {
                     commit('vacanciesPerPage', { item: response.data.data})
                     commit('totalPages', { item: response.data.last_page })
                     commit('totalVacancies', { item: response.data.total})
+                    commit('vacancyCoordinates', { item: null })
+                    var result1 = store.state.vacanciesPerPage;
+                    var result2 = store.state.favoriteVacanciesPerPage;
+                    var result = result1.filter(function(o1){
+                        return result2.some(function(o2){
+                          if(o1.id === o2.id){
+                            return  o1.ip = true
+                        }
+                  });
+              });
+                    }, (err) => {
+  console.log(err)
+
+                })
+
+              }
+              else if(store.state.searchQuery) {
+                axios.get(search, options).then((response) => {
+                    commit('vacanciesPerPage', { item: response.data.data})
+                    commit('totalPages', { item: response.data.last_page })
+                    commit('totalVacancies', { item: response.data.total})
                     commit('perPageFunction',{ item: parseInt(response.data.data.length)})
-                    console.log(response)
+                    commit('vacancyCoordinates', { item: null })
+                    var result1 = store.state.vacanciesPerPage;
+                    var result2 = store.state.favoriteVacanciesPerPage;
+                    var result = result1.filter(function(o1){
+                        return result2.some(function(o2){
+                          if(o1.id === o2.id){
+                            return  o1.ip = true
+                          }
+                  });
+              });
                     }, (err) => {
                     console.log(err)
                 })
               }
-            //Get filtrated Vacancies, filtration component start
-              else if (store.state.filterIndicator === true){
-                var options = {
-                    params: {
-                    city: store.state.city,
-                    employment: store.state.employment,
-                    page: page,
-                    number: store.state.perPage,
-                  }
-                }
-              axios.get(filtration, options).then(function(response) {
-                console.log(response)
-                  commit('vacanciesPerPage', { item: response.data.data})
-                  commit('totalPages', { item: response.data.last_page })
-                  commit('totalVacancies', { item: response.data.total})
-                }, (err) => {
-                    console.log(err)
-            })
-              //Get filtrated Vacancies, filtration component start end
-            }
-
           },
-
+     //details of vacancy
         vacancyDetails: function ({ commit }, id ) {
               var options = {
                   params: {
@@ -128,32 +190,115 @@ state: {
                     }
                 }
                 axios.get(allVacancy + id).then((response) => {
-                    console.log(response.data)
-                    commit('vacancyDetails', { item: response.data })
+                    commit('vacancyCoordinates', { item: response.data.address })
+
+                    var result2 = response.data;
+                    var result1 = store.state.favoriteVacanciesPerPage;
+
+                    result1.forEach( function (arrayItem){
+                                var x = parseInt(arrayItem.id)
+                                var y = parseInt(result2.id)
+                                if (x === y) {
+                                  result2.ip = true
+                                }
+
+                            });
+                  commit('vacancyDetails', { item: result2 })
+
+
                     }, (err) => {
                     console.log(err)
                 })
               },
+        //poopup profile
         hideProfile({commit}){
           commit('show', {item: false})
         },
         showProfile({commit}){
           commit('show', {item: true})
         },
-
-         getMap(){
-           axios.get('https://maps.googleapis.com/maps/api/js?key=AIzaSyCPxHbMTNdS2FyQgibEYxOIKIl1Zyw2Sv8&callback=initMap').then((response) => {
-               console.log(response)
-               console.log(1)
-               }, (err) => {
-               console.log(err)
-           })
-
-         }
-
-
-
-
+        //token check
+        tokenChecker({commit}){
+          if(localStorage.getItem('JWT')) {
+            commit('tokenPresence', { item: true })
         }
-    })
+          else if(localStorage.getItem('JWT') == false || localStorage.getItem('JWT') === undefined) {
+            commit('tokenPresence', { item: false })
+            alert('lol')
+        }
+      },
+         tokenRemove({commit}){
+           localStorage.removeItem('JWT')
+           commit('tokenPresence', { item: false })
+           axios.get(logout).then((response) => {
+             console.log(response)
+                       }, (err) => {
+                       console.log(err)
+                   })
+
+         },
+         getToken: function(){
+             let options = {
+                 params:{
+                     'JWT': token
+                 }
+             };
+             let url = 'http://178.124.206.45:443/api/refresh';
+
+             request.getData(url,options,null, function (msg) {
+                 console.log(msg);
+             })
+         },
+      //favorite
+      favorite({commit}, id) {
+        var options = {
+                id: id
+            }
+      axios.post(favorite, options).then((response) => {
+                  }, (err) => {
+                  console.log(err)
+              })
+
+      },
+      //unfavorite
+      unFavorite({commit}, id) {
+        var options = {
+          params: {
+            id: id
+          }
+            }
+      axios.delete(favorite + id).then((response) => {
+                  }, (err) => {
+                  console.log(err)
+              })
+
+      },
+    getFavoriteVacancies({commit}) {
+        var options = {
+            }
+      axios.get(favorite).then((response) => {
+        commit('favoriteVacanciesPerPage', { item: response.data})
+        commit('vacancyCoordinates', { item: null })
+
+                  }, (err) => {
+                  console.log(err)
+              })
+      },
+
+      //get Info
+    getUserInfo({commit}){
+      axios.get(user).then((response) => {
+      commit('userInfo', {item: response.data.data})
+                }, (err) => {
+                console.log(err)
+            })
+      },
+
+
+
+
+
+
+    }
+})
  export default store

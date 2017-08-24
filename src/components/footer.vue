@@ -1,11 +1,10 @@
 <template lang="html">
   <div class="">
-    <footer>
+
       <div class="footer">
-vdsvfddf
       </div>
 
-    </footer>
+
 
   </div>
 </template>
@@ -20,16 +19,6 @@ export default {
 <style scoped>
 
 
-footer {
-  margin-top: 40px;
-  background-color: #039BE5 !important;
-  min-height: 80px;
-  width: 100%;
-}
 
 
-.footer {
-  display: block;
-
-}
 </style>

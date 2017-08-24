@@ -28,10 +28,7 @@
           </button>
       <span class="" v-show="showMsg" >{{ btnMsg }}</span>
            </router-link>
-
-
-
-
+      <span id="msg"></span>
       <br>
     </div>
     </div>
@@ -69,18 +66,20 @@
 
       methods: {
           onReset(){
-              const url = 'http://178.124.206.45:443/api/password';
+              const url = 'http://api.spidergrodno.tk/api/password';
               const options = {
                   params: {
                       email: this.user.mail,
                   }
               };
-              let msg = ''
-
+              const defaultUrl = '/resetPassword';
               if(this.user.mail !== '')
               {
-                  this.btnMsg = request.getData(url, options);
-                  this.btnMsg = msg;
+                  request.getData(url, options,defaultUrl, function (msg) {
+                      console.log(msg);
+                      document.getElementById('msg').innerHTML = msg;
+                      console.log(document.getElementById('msg').innerHTML);
+                  });
                }
               else{
                   this.btnMsg = 'Field is required!!!';
@@ -106,7 +105,7 @@
     width: 550px;
     border-radius: 10px;
     box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.15);
-    background-image: url(/src/img/blue.jpg);
+    background-image: url(/img/blue.jpg);
     background-position: center;
     background-attachment: fixed;
   }

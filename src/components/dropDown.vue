@@ -12,8 +12,8 @@
                 <div class="profileFlex" v-if="show" >
                     <router-link to="/settings"><button>Настройки</button>
                     </router-link>
-                    <router-link to="/favoriteVacancies"><button>Vacancies</button></router-link>
-                    <router-link to="/" @click="logOut"><button>Log out</button></router-link>
+                    <router-link to="/favoriteVacancies"><button>Избранное</button></router-link>
+                    <router-link to="/" ><button @click="tokenRemove()">Выйти</button></router-link>
                 </div>
             </transition>
         </div>
@@ -32,14 +32,19 @@
               }
         },
         methods: {
-            logOut: function (){
-                $window.localStorage.clear();
-            },
             showProfile: function () {
                 this.$store.dispatch('showProfile')
             },
             hideProfile(){
-              this.$store.dispatch('hideProfile')
+                this.$store.dispatch('hideProfile')
+            },
+            tokenRemove(){
+                this.$store.dispatch('tokenRemove')
+                this.$router.push({path: '/'});
+                setTimeout(function() {
+                  location.reload();
+                }, 1000)
+
             }
         }
     }
@@ -62,13 +67,14 @@
 
 
     .profileFlex {
-        display: flex;
+        display: block;
         flex-direction: column;
         position: absolute;
+        margin-right: 30px;
         margin-top: 10px;
         box-shadow:  0 1px 10px 0 #6389b9;
         z-index: 1;
-        width: 200px;
+        width: 14vh;
         background-color: white;
         border-radius: 5px;
 

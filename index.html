@@ -12,16 +12,31 @@
 <body>
     <div id="app">
       <myheader></myheader>
+      <div class="middle_container">
              <router-view></router-view>
              <br>
+      </div>
         <myfooter></myfooter>
     </div>
     <script src="/dist/build.js"></script>
 </body>
 <style>
     body{
-        background-color: #f7fcff;
+        background-color: #f5f0f0;
+
     }
+  .middle_container{
+    margin-left: 10%;
+    margin-right: 10%;
+
+  }
+
+  @media screen and (max-width: 1350px){
+  .middle_container{
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+}
     </style>
 
 </html>

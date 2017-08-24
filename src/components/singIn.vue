@@ -32,10 +32,9 @@
                                 <label @click.prevent="user.remember = !user.remember">Remember me</label>
                             </tr>
                             <tr class='tr'>
-                                <input class="btn" data-disable-with="Signing in…" name="commit" tabindex="2" type="submit" value="Sign in" @click.prevent="onSingIn"/>
+                                <input class="btn" data-disable-with="Signing in�" name="commit" tabindex="2" type="submit" value="Sign in" @click.prevent="onSingIn"/>
                             </tr>
-                            <span class="" v-show="showMsg" >{{ btnMsg }}</span>
-
+                            <span id="msg"></span>
                         </table>
                     </div>
                 </form>
@@ -71,8 +70,7 @@
                 emailMsg: '',
                 passwordMsg: '',
                 showMsg : true,
-                btnMsg: '',
-
+                btnMsg: ''
             }
         },
         watch: {
@@ -87,8 +85,8 @@
         },
         methods: {
             onSingIn(){
-                let msg = '';
-                const url = 'http://178.124.206.45:443/api/login';
+                console.log(this.$route);
+                const url = 'http://api.spidergrodno.tk/api/login';
                 const options = {
                     email: this.user.mail,
                     password: this.user.password,
@@ -98,8 +96,13 @@
                     alert('All fields are required!!!')
                 }
                 else {
-                    msg = request.postData(url, options, /*'/'*/);
-                    console.log(msg)
+                    request.postData(url, options, '/', function (msg) {
+                        document.getElementById('msg').innerHTML = msg;
+                        console.log(document.getElementById('msg').innerHTML);
+                    })
+
+
+
                 }
             },
 
@@ -107,18 +110,6 @@
             {
                 return localStorage.getItem('JWT');
             },
-
-            SingOut(){
-                const url = 'http://178.124.206.45:443/api/logout';
-                let JWT = getToken();
-                options = {
-                    params: {
-                        token: JWT
-                    }
-                };
-                request.getData(url, options, '/');
-                // localStorage.clear;
-            }
         }
     }
 </script>
@@ -138,7 +129,7 @@
         width: 550px;
         border-radius: 10px;
         box-shadow: 2px 2px 2px 1px rgba(0,0,0,0.15);
-        background-image: url(/src/img/blue.jpg);
+        background-image: url(/img/blue.jpg);
         background-position: center;
         background-attachment: fixed;
         z-index: 2;

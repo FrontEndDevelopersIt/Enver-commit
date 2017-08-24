@@ -1,15 +1,35 @@
 <template>
-    <div>
-
+  <div class="">
+    <div class="left_div">
+    </div>
         <section class="divSettings">
         <div class="container">
-            <h1>Settings</h1>
+            <h1>Настройки</h1>
+            <div class="box">
+              <table>
+                <tr>
+                  <td><p>Ваш ID:</p></td><td>{{userInfo.id}}</td>
+                </tr>
+                <tr>
+                  <td><p>Ваш текущий город:</p></td><td>{{userInfo.city}}</td>
+                </tr>
+                <tr>
+                  <td><p>Вы зарегистрировались:</p></td><td>{{date(userInfo.created_at)}}</td>
+                </tr>
+                <tr>
+                  <td><p>Вы текущий телефон:</p></td><td>{{phone(userInfo.phone)}}</td>
+                </tr>
+                <tr>
+                  <td><p>Ваше имя:</p></td><td>{{userInfo.name}}</td>
+                </tr>
+              </table>
+            </div>
             <div class="boxOfInputs">
                 <div class="inputs" @keyup.enter="updateUser(user)">
-                    Name:<div><input class="inputsInSettings" type="text" v-model="user.userName" placeholder="Name"></div>
-                    Number:<div><input class="inputsInSettings" type="text" v-model="user.number" placeholder="Number"></div>
-                    City:<div><input class="inputsInSettings" type="text" v-model="user.city" placeholder="City"></div>
-                    Password:<div><input class="inputsInSettings" type="password" v-model="user.password" placeholder="Password" ></div>
+                    Ваше имя:<div><input class="inputsInSettings" type="text" v-model="user.userName" placeholder="Name"></div>
+                    Ваш номер:<div><input class="inputsInSettings" type="text" v-model="user.number" placeholder="Number"></div>
+                    Ваш город:<div><input class="inputsInSettings" type="text" v-model="user.city" placeholder="City"></div>
+                    Пароль:<div><input class="inputsInSettings" type="password" v-model="user.password" placeholder="Password" ></div>
                 </div>
                 <div></div>
             </div>
@@ -20,7 +40,7 @@
         </section>
     </div>
 
-
+  </div>
 </template>
 
 <script>
@@ -36,12 +56,31 @@
                     password: "****"
                 }
             }
+
+        },
+        computed: {
+          userInfo(){
+            return this.$store.state.userInfo
+          }
         },
         components:{myheader},
         methods: {
             updateUser(){
                 //this.$store.dispatch('UpdateUser', this.user);
+            },
+            date(n) {
+              var k = n.split(' ')[0]
+              var z = k.split('-').join(' ')
+              return z
+            },
+            phone(n){
+              if(n ===null){return "Вы не указали телефон" }
             }
+        },
+        created(){
+          if(this.$store.state.tokenPresence===true) {this.$store.dispatch('getUserInfo')}
+          if(this.$store.state.tokenPresence===false) {this.$router.push({path: '/singIn'})}
+
         }
     }
 </script>
@@ -70,8 +109,8 @@
     }
     .boxOfInputs {
         display: flex;
-        justify-content: space-around;
-        height: 40vh;
+        flex-direction: column;
+        width: 70%;
         align-items: flex-end;
         margin: 0 100px 0 100px;
     }
@@ -82,6 +121,10 @@
     .inputs input {
         width: 400px;
         border: 2px forestgreen solid;
+    }
+    .box {
+      display: flex;
+      flex-direction: column;
     }
 
     #buttonConfirm {
@@ -120,6 +163,39 @@
         outline: 0!important;
 
     }
+        .box{
+          margin-top: 20px;
+          padding: 0 20px 0 20px;
+          margin-bottom: 20px;
+        }
+        table{
+          padding: 0px;
+          text-align: left;
+          margin-bottom: 20px;
+          font-size: 17px;
+        }
+        tr{
+          text-align: left;
+          white-space: nowrap;
+          border-radius: 4px;
+          margin: 0px;
+          padding: 0px;
+          color: white;
+          font-weight: 400;
+          border-bottom: 1px solid black;
+
+        }
+        td p{
+          display: inline-block;
+          margin: 0px;
+          font-weight: 400;
+          color: black;
+          float:left;
+        }
+        tr:hover{
+          background-color: #ce7031;
+        }
+
 
 
 </style>
