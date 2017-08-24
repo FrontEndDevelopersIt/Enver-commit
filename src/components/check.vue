@@ -1,7 +1,7 @@
 <template>
   <div class = "container">
     <div class="registration_cont">
-    <h4>We sent you an email to the address you indicated, please check it and follow the link to activate an account</h4>
+    <h4> На указанный адрес было отправлено письмо со ссылкой для подтверждения. Пожалуйста, проверьте Ваш почтовый ящик</h4>
   </div>
   </div>
 </template>
@@ -262,6 +262,8 @@
   }
   h4{
     color: white;
+    padding: 16px;
+    font-size: 25px;
   }
   .checkbox p{
     font-size: 15px;

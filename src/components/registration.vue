@@ -59,13 +59,14 @@
                 <tr>
                     <div class="password">
                         <input type="password" name="Password" v-model="newUser.password" placeholder="Password" maxlength="16" >
-                    </div>
+
                     <br>
                     <span class="error_control" v-show="isError">
                             {{ passwordMsg }}
                         </span>
+                        </div>
                 </tr>
-
+                <br>
                 <tr>
                     <div class="try">
                         <label class="lbl"><p>Confirm password:</p></label>
@@ -258,6 +259,7 @@
         text-align: center;
         border-radius: 5px;
         height: 26px;
+        color: black;
     }
 
     button {
@@ -344,9 +346,10 @@
         width: 355px;
         display: inline-block;
         height: 35px;
-        color: #D1D1D1;
+
         padding-left: 2px;
         padding-right: 2px;
+        color: black;
 
     }
     select:checked, select:focus, select:active {
@@ -355,7 +358,7 @@
     }
 
     .error_control {
-        text-align: left;
+        float: left;
     }
 
     .checkbox {
@@ -451,5 +454,10 @@
     }
     .checkbox p{
         font-size: 15px;
+    }
+
+    #msg {
+      padding-top: 10px;
+      position: relative;
     }
 </style>

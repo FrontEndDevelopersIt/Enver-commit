@@ -28,7 +28,10 @@
           </button>
       <span class="" v-show="showMsg" >{{ btnMsg }}</span>
            </router-link>
-      <span id="msg"></span>
+           <div class="msg_cont">
+             <span id="msg"></span>
+           </div>
+
       <br>
     </div>
     </div>
@@ -96,11 +99,10 @@
 }
 
   .container {
-
     text-align: left;
     color: white;
     margin-top: 30px;
-    padding: 20px 50px 50px 50px;
+    padding: 20px 50px 10px 50px;
     color: white;
     width: 550px;
     border-radius: 10px;
@@ -238,5 +240,18 @@
     margin-left: 120px;
   }
 
+  .msg_cont{
+    display: block;
+    width: 100%;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
 
+  }
+  .msg_cont span{
+    padding-top: 20px;
+    display: block;
+    margin: auto;
+    width: 25%;
+
+  }
 </style>

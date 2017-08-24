@@ -32,9 +32,11 @@
                                 <label @click.prevent="user.remember = !user.remember">Remember me</label>
                             </tr>
                             <tr class='tr'>
-                                <input class="btn" data-disable-with="Signing in�" name="commit" tabindex="2" type="submit" value="Sign in" @click.prevent="onSingIn"/>
+                                <input class="btn" data-disable-with="Signing in" name="commit" tabindex="2" type="submit" value="Sign in" @click.prevent="onSingIn"/>
                             </tr>
+                          <div class="msg_cont">
                             <span id="msg"></span>
+                          </div>
                         </table>
                     </div>
                 </form>
@@ -124,7 +126,7 @@
         text-align: left;
         color: white;
         margin-top: 30px;
-        padding: 20px 50px 50px 50px;
+        padding: 20px 50px 20px 50px;
         color: white;
         width: 550px;
         border-radius: 10px;
@@ -258,5 +260,21 @@
 
     }
 
+.msg_cont{
+  display: block;
+  width: 100%;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
 
+}
+.msg_cont span{
+  padding-top: 20px;
+  display: block;
+  margin: auto;
+  width: 25%;
+
+}
+.btn {
+  margin-top: 10px;
+}
 </style>

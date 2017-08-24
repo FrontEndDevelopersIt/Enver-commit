@@ -220,11 +220,12 @@ state: {
         //token check
         tokenChecker({commit}){
           if(localStorage.getItem('JWT')) {
+            alert(localStorage.getItem('JWT') === undefined)
             commit('tokenPresence', { item: true })
         }
           else if(localStorage.getItem('JWT') == false || localStorage.getItem('JWT') === undefined) {
             commit('tokenPresence', { item: false })
-            alert('lol')
+            alert('dsc')
         }
       },
          tokenRemove({commit}){

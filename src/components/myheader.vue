@@ -12,7 +12,7 @@
 
             <div class="greetings" >
               <p class="text" v-show="!this.$store.state.tokenPresence">&#8222;Найти работу - легко!&#8221; </p>
-              <p v-show="this.$store.state.tokenPresence">{{this.helloAutorization}}</p><p><router-link to="/settings">  {{ this.$store.state.userInfo.name}}</router-link></p>
+              <p  class="text2" v-show="this.$store.state.tokenPresence">{{this.helloAutorization  }}</p><p class="text3"><router-link to="/settings">  {{ this.$store.state.userInfo.name}}</router-link></p>
             </div>
 
             <div class="someBlock">
@@ -412,9 +412,16 @@ button p{
   height: 20px;
 }
 
-
+.text2{
+margin-right: 10px;
+}
 
 .text{
   padding-left: 35%;
+}
+
+.text3 a{
+  border-bottom: 2px dashed white;
+  display: inline;
 }
 </style>

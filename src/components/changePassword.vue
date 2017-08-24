@@ -43,7 +43,9 @@
           Reset
         </button>
         </router-link>
-        <span id="msg"></span>
+        <div class="msg_cont">
+          <span id="msg"></span>
+        </div>
 
 
     </div>
@@ -286,6 +288,21 @@
     text-align: center;
     margin-top: 20px;
     margin-left: 120px;
+  }
+
+  .msg_cont{
+    display: block;
+    width: 100%;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+
+  }
+  .msg_cont span{
+    padding-top: 20px;
+    display: block;
+    margin: auto;
+    width: 25%;
+
   }
 
 </style>
